@@ -10,7 +10,7 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 
-const pages = ['Estudiantes', 'Profesores', 'Postgrados', 'Reportes'];
+const pages = ['Estudiantes', 'Profesores', 'Nacionales', 'Internacionales', 'Reportes'];
 
 const Appbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
