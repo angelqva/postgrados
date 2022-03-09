@@ -15,7 +15,7 @@ ReactDOM.render(
     <StyledEngineProvider injectFirst>
       <Appbar />
       {/* <Inicio /> */}
-      {/* <Estudiantes/> */}
+      <Estudiantes/>
     </StyledEngineProvider>
   </React.StrictMode>,
   document.getElementById('root')
