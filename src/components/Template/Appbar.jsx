@@ -9,9 +9,17 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
+import { Link as RouterLink} from 'react-router-dom';
 
-const pages = ['Estudiantes', 'Profesores', 'Nacionales', 'Internacionales', 'Reportes'];
-
+// const pages = ['Estudiantes', 'Profesores', 'Nacionales', 'Internacionales', 'Reportes'];
+const rutas = [
+  {
+    label: 'Estudiantes', value: '/estudiantes'
+  },
+  {
+    label: 'Profesores', value: '/profesores'
+  },
+];
 const Appbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
 
@@ -26,11 +34,14 @@ const Appbar = () => {
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
+        
         <Toolbar disableGutters>
           <Typography
             variant="h6"
             noWrap
-            component="h6"
+            component={RouterLink}
+            to='/'
+            className='brand'
             sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
           >
             APLICACIÓN POSTGRADOS
@@ -38,7 +49,9 @@ const Appbar = () => {
           <Typography
             variant="h6"
             noWrap
-            component="h6"
+            component={RouterLink}
+            to='/'
+            className='brand'
             sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' }, justifyContent:'center'}}
           >
             APLICACIÓN POSTGRADOS
@@ -72,21 +85,28 @@ const Appbar = () => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
+              {rutas.map((ruta, index) => (
+                <MenuItem
+                  key={index}
+                  onClick={handleCloseNavMenu}
+                  component={RouterLink}
+                  to={ruta.value}
+                >
+                  <Typography textAlign="center">{ruta.label}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent:'end'}}>
-            {pages.map((page) => (
+            {rutas.map((ruta, index) => (
               <Button
-                key={page}
+                key={index}
+                to={ruta.value}
                 onClick={handleCloseNavMenu}
+                component={RouterLink}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {ruta.label}
               </Button>
             ))}
           </Box>

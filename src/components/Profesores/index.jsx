@@ -3,7 +3,7 @@ import { Box, Grid } from '@mui/material';
 import Crear from './Crear'
 import Tabla from './Tabla';
 
-export default function Estudiantes() {
+export default function Profesores() {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Grid container>

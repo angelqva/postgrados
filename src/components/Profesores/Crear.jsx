@@ -1,9 +1,6 @@
 import * as React from 'react';
 import { Box, TextField, Paper, Grid, Typography} from '@mui/material';
-import { FormControl, FormHelperText, MenuItem } from '@mui/material';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import DatePicker from '@mui/lab/DatePicker'; 
+import { FormControl, FormHelperText, MenuItem, Button } from '@mui/material';
 
 const grenders = [
   {
@@ -15,21 +12,42 @@ const grenders = [
     label: 'Masculino',
   }
 ];
+const cientificas = [
+    'Ninguna',
+    'Master en Ciencias',
+    'Doctor en Ciencias',    
+];
+
+const docentes = [
+    'Asistente',
+    'Ausiliar',
+    'Instructor',
+    'Titular'
+];
+
 
 function Crear() {
 
     const [grender, setGrender] = React.useState('masculino');
-    const [date, setDate] = React.useState(null);
+    const [cientifica, setCientifica] = React.useState('Ninguna');
+    const [docente, setDocente] = React.useState('Instructor');
+    
 
     const handleSelectChange = (event) => {
         setGrender(event.target.value);
+    };
+    const handleCientifica = (event) => {
+        setCientifica(event.target.value);
+    };
+    const handleDocente = (event) => {
+        setDocente(event.target.value);
     };
     
     return (
         <Box
             sx={{
                 alignItems: 'center',
-                '& > :not(style)': { m:'24px 8px 8px 8px' },
+                '& > :not(style)': { m:'48px 8px 8px 8px' },
                 width:'100%'
             }}
             component='form'
@@ -40,7 +58,7 @@ function Crear() {
                         <Typography gutterBottom={false} variant='h6' className='card-title' sx={{
                             fontSize:{ xs:'1.2em', md:'1.5em'},
                             }}>
-                            Datos del Estudiante
+                            Datos del Profesor
                         </Typography>
                         <Typography gutterBottom={false} variant='p' className='card-subTitle' component={'p'} sx={{
                             fontSize: { xs:'1em', md:'1.25em'},
@@ -121,27 +139,44 @@ function Crear() {
                         <Grid item xs={12} md={6}>
                             <FormControl className='form-control'>
                                 <TextField
-                                    name='residencia'
-                                    label='Residencia'
-                                />
-                                <FormHelperText>Introdusca su residencia</FormHelperText>
+                                    name='categoria_cientifica'
+                                    select
+                                    label='Categoría Científica'
+                                    value={cientifica}
+                                    onChange={handleCientifica}
+                                    >
+                                    {cientificas.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                        {option}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <FormHelperText>Seleccione una Categoría</FormHelperText>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <FormControl className='form-control'>
-                                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                                    <DatePicker
-                                        label='Año de Graduación'
-                                        name='year_graduacion'
-                                        value={date}
-                                        views={['year']}
-                                        onChange={(newValue) => {
-                                        setDate(newValue);
-                                        }}
-                                        renderInput={(params) => <TextField {...params} />}
-                                    />
-                                </LocalizationProvider>
-                                <FormHelperText>Año de Graduación</FormHelperText>
+                                <TextField
+                                    name='categoria_docente'
+                                    select
+                                    label='Categoría Docente'
+                                    value={docente}
+                                    onChange={handleDocente}
+                                    >
+                                    {docentes.map((option) => (
+                                        <MenuItem key={option} value={option}>
+                                        {option}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <FormHelperText>Seleccione una Categoría</FormHelperText>
+                            </FormControl>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <FormControl className='form-control'>
+                                <Button fullWidth variant="contained" size="large">
+                                    Guardar Profesor
+                                </Button>
                             </FormControl>
                         </Grid>
                     </Grid>
