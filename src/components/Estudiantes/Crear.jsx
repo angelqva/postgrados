@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Box, TextField, Paper, Grid, Typography} from '@mui/material';
-import { FormControl, FormHelperText, MenuItem } from '@mui/material';
+import { FormControl, FormHelperText, MenuItem, Button } from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DatePicker from '@mui/lab/DatePicker'; 
@@ -29,7 +29,7 @@ function Crear() {
         <Box
             sx={{
                 alignItems: 'center',
-                '& > :not(style)': { m:'24px 8px 8px 8px' },
+                '& > :not(style)': { m:'48px 8px 8px 8px' },
                 width:'100%'
             }}
             component='form'
@@ -142,6 +142,15 @@ function Crear() {
                                     />
                                 </LocalizationProvider>
                                 <FormHelperText>Año de Graduación</FormHelperText>
+                            </FormControl>
+                        </Grid>
+                    </Grid>
+                    <Grid container>
+                        <Grid item xs={12}>
+                            <FormControl className='form-control'>
+                                <Button fullWidth variant="contained" size="large">
+                                    Guardar Estudiante
+                                </Button>
                             </FormControl>
                         </Grid>
                     </Grid>

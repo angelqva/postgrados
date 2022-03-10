@@ -172,6 +172,8 @@ function Crear() {
                                 <FormHelperText>Seleccione una Categoría</FormHelperText>
                             </FormControl>
                         </Grid>
+                    </Grid>
+                    <Grid container>
                         <Grid item xs={12}>
                             <FormControl className='form-control'>
                                 <Button fullWidth variant="contained" size="large">
