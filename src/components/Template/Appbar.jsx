@@ -19,6 +19,15 @@ const rutas = [
   {
     label: 'Profesores', value: '/profesores'
   },
+  {
+    label: 'Nacionales', value: '/postgrados-nacionales'
+  },
+  {
+    label: 'Internacionales', value: '/postgrados-internacionales'
+  },
+  {
+    label: 'Reportes', value: '/reportes'
+  },
 ];
 const Appbar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -33,8 +42,7 @@ const Appbar = () => {
 
   return (
     <AppBar position="static">
-      <Container maxWidth="xl">
-        
+      <Container maxWidth="xl">        
         <Toolbar disableGutters>
           <Typography
             variant="h6"
