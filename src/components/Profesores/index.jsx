@@ -6,7 +6,7 @@ import Formulario from './Formulario'
 import { v4 as uuidv4 } from 'uuid';
 import Tabla from '../Utils/Tabla';
 import { useDispatch, useSelector } from 'react-redux';
-import { getListado, setErrores, setEliminados, doEliminar} from '../../redux/profesores'
+import { getListado, setErrores, setEliminados, doEliminar, doCrear, setCreando, resetItem, findItem, setBuscando, doEditar, setEditando} from '../../redux/profesores'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 const MySwal = withReactContent(Swal)
@@ -55,13 +55,21 @@ export default function Profesores() {
     const eliminados = useSelector(store => store.profesores.eliminados);
     const errRead = useSelector(store => store.profesores.errores.read);
     const errEliminar = useSelector(store => store.profesores.errores.eliminar);
-    const errCreate = useSelector(store => store.profesores.errores.create);
-    //const errEdit = useSelector(store => store.profesores.errores.edit);
-    
+    const errFormulario = useSelector(store => store.profesores.errores.formulario);
+    const creando = useSelector(store => store.profesores.creando);
+    const buscando = useSelector(store => store.profesores.buscando);
+    const editando = useSelector(store => store.profesores.editando);
+    const item = useSelector(store => store.profesores.item);
+    const [doCreate, setDoCreate] = React.useState(true);
+    const [doEdit, setDoEdit] = React.useState(false);
+    const [doReset, setDoReset] = React.useState(false);
     const tableTitle = 'Listado de Profesores';
     //listado
     React.useEffect(() => {
         dispatch(getListado());
+        return () => { 
+            cancelEdit();
+        }
     }, []);
     React.useEffect(() => {
         if (errRead.length > 0) {
@@ -69,15 +77,20 @@ export default function Profesores() {
             errRead.forEach(element => err.push(element.msg));
             var str = err.join(', ');
             MySwal.fire({
-                title: 'Problemas de conexón',
+                title: 'Se Encontraron Problemas',
                 text: str,
                 icon: 'error',
-                confirmButtonText:'Continuar'
+                confirmButtonText: 'Continuar',
+                didOpen: () => { 
+                    MySwal.hideLoading();
+                }
             }).then(() => {
+                setDoCreate(true);
+                setDoEdit(false);
                 dispatch(setErrores('eliminar','read',[]));
             })
         }
-    }, [errRead]);        
+    }, [errRead]);
     //end listado
     //delete
     const [totalDelete, setTotalDelete] = React.useState(0);
@@ -160,17 +173,149 @@ export default function Profesores() {
     //end delete
     //crear
     const dispatchSolveError = (error)=>{
-        dispatch(setErrores('eliminar', 'crear', error));
+        dispatch(setErrores('eliminar', 'formulario', error));
     }
-    const crearProfesor = (profesor)=>{ 
-        console.log(profesor);
+    const crearProfesor = (profesor) => {
+        dispatch(setCreando(true));
+        dispatch(doCrear(profesor));
+        MySwal.fire({
+            title: 'Espere, estamos:',
+            text: `Creando al Profesor ${profesor.nombre} ${profesor.apellidos}`,
+            allowOutsideClick: false,
+            didOpen: () => {
+                MySwal.showLoading()
+            },
+        })
     }
-    //endCrear
-
-    
-    const sendEdit = (id) => {
-            console.log(id);
+    const cantReset = () => {
+        setDoReset(false);
+        MySwal.fire({
+            title: 'Error',
+            text: 'Revise los siguientes errores',
+            icon: 'error',
+            didOpen: () => { 
+                MySwal.hideLoading();
+            }
+        })
+    }
+    const finishReset = () => {
+        if (doEdit){ 
+            setDoReset(false);
+            setDoEdit(false);
+            setDoCreate(true);
+            MySwal.fire({
+                title: 'Exito',
+                text: 'Editado Correctamente',
+                icon: 'success',
+                didOpen: () => { 
+                    MySwal.hideLoading();
+                }
+            })
         }
+        if (doCreate) { 
+            setDoReset(false);
+            MySwal.fire({
+                title: 'Creado Satisfactoriamente',
+                text: 'El Profesor: '+item.nombre+' '+item.apellidos,
+                icon: 'success',
+                didOpen: () => { 
+                    MySwal.hideLoading();
+                }
+            }).then(()=>dispatch(resetItem()))
+        }
+        
+    }
+    React.useEffect(() => {
+        if (!creando) {
+            setDoReset(true);
+        }
+    },[creando]);
+    //endCrear
+    //edit
+    const sendEdit = (id) => {
+        dispatch(resetItem());
+        dispatch(setBuscando(true));
+        dispatch(findItem(id));
+        MySwal.fire({
+            title: 'Espere, estamos:',
+            text: `Buscando cargando los datos del Profesor`,
+            allowOutsideClick: false,
+            didOpen: () => {
+                MySwal.showLoading()
+            },
+        })
+    }
+    const cancelEdit = () => {
+        dispatch(resetItem());
+        setDoCreate(true);
+        setDoEdit(false);
+        //window.location.reload(false);
+     }
+    React.useEffect(() => {
+        if (!buscando) { 
+            if (!!item.id) {
+                setDoCreate(false);
+                setDoEdit(true);
+                MySwal.fire({
+                    title: 'Encontrado!!',
+                    text: 'Proceda a editar sus Datos',
+                    icon: 'success',
+                    didOpen: () => {
+                        MySwal.hideLoading();
+                    }
+                })
+            }
+        }
+    },[buscando])
+
+    const editProfesor = (profesor) => {
+        var partialEdit = {};
+        var cont = 0;
+        for (const property in item) { 
+            if (property !== "id") {
+                if (property === "edad") { 
+                    if (parseInt(profesor[property]) !== item[property]) { 
+                        partialEdit[property] = parseInt(profesor[property]);
+                        cont++
+                    }
+                }
+                else if (profesor[property] !== item[property]) { 
+                    partialEdit[property] = profesor[property];
+                    cont++
+                }
+            }
+        }
+        if (cont >= 1) {
+            console.log(doEdit);
+            dispatch(setEditando(true));
+            dispatch(doEditar(partialEdit))
+            MySwal.fire({
+                title: 'Espere, estamos:',
+                text: `Guardando los cambios`,
+                allowOutsideClick: false,
+                didOpen: () => {
+                    MySwal.showLoading()
+                },
+            })
+        }
+        else { 
+            MySwal.fire({
+                title: 'Alerta',
+                text: 'No ha realizado ningun cambio',
+                icon: 'warning'
+            })
+        }
+    }
+    
+    React.useEffect(() => { 
+        if (!editando) {
+            setDoReset(true);
+        }
+    },[editando]);
+    //endEdit
+    
+
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Grid container>
@@ -179,8 +324,15 @@ export default function Profesores() {
                     <Formulario
                         dispatchSolveError={dispatchSolveError}
                         crearFunction={crearProfesor}
-                        errores={errCreate}
-                        doCreate={true}
+                        editFunction={editProfesor}
+                        errores={errFormulario}
+                        doCreate={doCreate}
+                        doEdit={doEdit}
+                        cancelEdit={cancelEdit}
+                        doReset={doReset}
+                        finishReset={finishReset}
+                        item={item}
+                        cantReset={cantReset}
                     />
                 </Grid>
                 <Grid item xs={12} md={8}>

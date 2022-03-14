@@ -3,34 +3,33 @@ import { TextField} from '@mui/material';
 import { FormControl, FormHelperText} from '@mui/material';
 import { Controller} from "react-hook-form";
 
-export default function FormInputText({ name, value='', control, setValue, handleChange, rules, label, type = 'text', helperText, responseErrors }){
+export default function FormInputText({ name, control, rules, label, helperText, solveError, ...textProps}){
     
-    const [inputValue, setInputValue] = React.useState(value);
-    React.useEffect(() => {
-        setValue(inputValue)
-    }, [inputValue,setValue])
-    const handleInputChange = (event)=>{
-        setInputValue(event.target.value);
-        if(!!handleChange){handleChange(event)}
-    }
     return (
         <Controller
             name={name}
             control={control}
             rules={rules}
             render={({
+                field: { onChange, value },
                 fieldState: { error },
             }) => (
-                <FormControl className='form-control' error={!!error||!!responseErrors}>
+                <FormControl className='form-control' error={!!error}>
                     <TextField
                         label={label}
-                        value={inputValue}
-                        type={type}
-                        onChange={handleInputChange}
+                        value={value}
+                        error={!!error}
+                        onChange={(e) => {
+                            if (!!error) { 
+                                if (!!solveError) { solveError(name);}
+                            }
+                            onChange(e);
+                        }}
+                        {...textProps}
                     />
                     {error
-                        ? <FormHelperText>error.message</FormHelperText>
-                        : <FormHelperText>{helperText}{ responseErrors && responseErrors.message } </FormHelperText>
+                        ? <FormHelperText>{error.message}</FormHelperText>
+                        : <FormHelperText>{helperText}</FormHelperText>
                     }
                 </FormControl>
             )}

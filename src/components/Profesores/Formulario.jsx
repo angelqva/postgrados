@@ -1,5 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import { Box, Paper, Grid, Typography} from '@mui/material';
+import { Box, Paper, Grid, Typography, Link} from '@mui/material';
 import { Button, FormControl } from '@mui/material';
 import FormInputText from '../Utils/FormInputText';
 import FormInputTextSelect from '../Utils/FormInputTextSelect';
@@ -7,8 +8,8 @@ import { useForm } from 'react-hook-form';
 
 const cientificas = [
     'Ninguna',
-    'Master en Ciencias',
-    'Doctor en Ciencias',
+    'Master',
+    'Doctor',
 ];
 
 const docentes = [
@@ -23,17 +24,12 @@ function Crear({
     doCreate = true,
     crearFunction,
     editFunction,
+    cancelEdit,
     doEdit = false,
-    item = {
-        id: null,
-        carnet_identidad: '',
-        nombre: '',
-        apellidos: '',
-        edad: '',
-        especialidad: '',
-        categoria_docente: 'Instructor',
-        categoria_cientifica: 'Ninguna',
-    },
+    doReset=false,
+    finishReset,
+    cantReset,
+    item,
     errores = {
         carnet_identidad: '',
         nombre: '',
@@ -43,46 +39,77 @@ function Crear({
         categoria_docente: '',
         categoria_cientifica: '',
     },
-    dispatchSolveError}) {
-    const { handleSubmit, control, setValue} = useForm();
-    const [nombre, setNombre] = React.useState(item.nombre);
-    const [carnet_identidad, setCarnet_identidad] = React.useState(item.carnet_identidad)
-    const [apellidos, setApellidos] = React.useState(item.apellidos)
-    const [edad, setEdad] = React.useState(item.edad)
-    const [especialidad, setEspecialidad] = React.useState(item.especialidad)
-    const [categoria_docente, setCategoria_docente] = React.useState(item.categoria_docente)
-    const [categoria_cientifica, setCategoria_cientifica] = React.useState(item.categoria_cientifica)
+    dispatchSolveError }) {
     
-    const handleNombre = (event) => {
-        setNombre(event.target.value);
-        dispatchSolveError({ nombre: [] });
+    const { handleSubmit, control,reset, setError, setValue, clearErrors } = useForm({
+        defaultValues: {
+            carnet_identidad: '',
+            nombre: '',
+            apellidos: '',
+            edad: '',
+            especialidad: '',
+            categoria_docente: 'Instructor',
+            categoria_cientifica: 'Ninguna'
+        }
+    });
+    React.useEffect(() => {
+        if (doReset) {
+            if (doCreate) {
+                if (!!item.id) {
+                    reset({});
+                    finishReset();
+                }
+                else {
+                    cantReset();
+                }
+            }
+            if (doEdit) { 
+                if (!!item.id) {
+                    cantReset();
+                }
+                else { 
+                    reset({});
+                    finishReset();
+                }
+            }
+        }
+    }, [doReset]);
+    React.useEffect(() => {
+        if (doEdit) {
+            setValue('nombre', item.nombre, { shouldValidate: true });
+            setValue('apellidos', item.apellidos, { shouldValidate: true });
+            setValue('carnet_identidad', item.carnet_identidad, { shouldValidate: true });
+            setValue('edad', item.edad, { shouldValidate: true });
+            setValue('especialidad', item.especialidad, { shouldValidate: true });
+            setValue('categoria_docente', item.categoria_docente, { shouldValidate: true });
+            setValue('categoria_cientifica', item.categoria_cientifica, { shouldValidate: true });
+        }
+        else {
+            reset({});
+        }
+    },[doEdit]);
+    React.useEffect(() => {
+        for (const property in errores) {
+            if(errores[property].length>0)
+            setError(property, {
+                type: "response",
+                message: errores[property],
+            });
+        }
+    },[errores, setError])
+    const solveError = (property) => {
+        var error = errores[property];
+        if (error.length > 0) {
+            dispatchSolveError({type:property, payload:''});
+        }
     }
-    const handleApellidos = (event) => {
-        setApellidos(event.target.value);
-        dispatchSolveError({ apellidos: [] });
-    }
-    const handleCarnet_Identidad = (event) => {
-        setCarnet_identidad(event.target.value);
-        dispatchSolveError({ carnet_identidad: [] });
-    }
-    const handleEdad = (event) => {
-        setEdad(event.target.value);
-        dispatchSolveError({ edad: [] });
-    }
-    const handleEspecialidad = (event) => {
-        setEspecialidad(event.target.value);
-        dispatchSolveError({ especialidad: [] });
-    }
-    const handleCientifica = (event) => {
-        setCategoria_cientifica(event.target.value);
-        dispatchSolveError({ categoria_cientifica: [] });
-    };
-    const handleDocente = (event) => {
-        setCategoria_docente(event.target.value);
-        dispatchSolveError({ categoria_docente: [] });
-    };
     const onSubmit = (data) => {
-        console.log(data)
+        if (doCreate) { 
+            crearFunction(data)
+        }
+        if (doEdit) { 
+            editFunction(data);
+        }
     };
 
     return (
@@ -109,7 +136,6 @@ function Crear({
                                 Complete los siguientes campos
                             </Typography>
                         </Grid>
-                        
                         <Grid container>
                             <Grid item xs={12} md={6}>
                                 <FormInputText
@@ -117,10 +143,14 @@ function Crear({
                                 label='Nombre'
                                 control={control}
                                 helperText='Introdusca el nombre'
-                                handleChange={handleNombre}
-                                value={nombre}
-                                setValue={setValue}
-                                responseErrors={ errores.nombre.length>0 ? errores.nombre :null}
+                                solveError={solveError}
+                                rules={{
+                                    required: 'Este campo es requerido',
+                                    minLength: {
+                                        value: 4,
+                                        message:'Mayor de 4 caracteres'
+                                    }
+                                }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -129,10 +159,14 @@ function Crear({
                                 label='Apellidos'
                                 control={control}
                                 helperText='Introdusca los Apellidos'
-                                handleChange={handleApellidos}
-                                value={apellidos}
-                                setValue={setValue}
-                                responseErrors={ errores.apellidos.length>0 ? errores.apellidos :null}
+                                solveError={solveError}
+                                rules={{
+                                    required: 'Este campo es requerido',
+                                    minLength: {
+                                        value: 4,
+                                        message:'Mayor de 4 caracteres'
+                                    }
+                                }}
                                 />
                             </Grid>
                         </Grid>
@@ -144,10 +178,18 @@ function Crear({
                                 type='number'
                                 control={control}
                                 helperText='Introdusca los 11 digitos del carnet'
-                                handleChange={handleCarnet_Identidad}
-                                value={carnet_identidad}
-                                setValue={setValue}
-                                responseErrors={ errores.carnet_identidad.length>0 ? errores.carnet_identidad :null}
+                                solveError={solveError}
+                                rules={{
+                                    required: 'Este campo es requerido',
+                                    minLength: {
+                                        value: 11,
+                                        message:'Debe tener 11 caracteres'
+                                    },
+                                    maxLength: {
+                                        value: 11,
+                                        message:'Debe tener 11 caracteres'
+                                    }
+                                }}
                                 />
                             </Grid>
                         </Grid>
@@ -159,10 +201,14 @@ function Crear({
                                 type='number'
                                 control={control}
                                 helperText='Introdusca su edad'
-                                handleChange={handleEdad}
-                                value={edad}
-                                setValue={setValue}
-                                responseErrors={ errores.edad.length>0 ? errores.edad :null}
+                                solveError={solveError}
+                                rules={{
+                                    required: 'Este campo es requerido',
+                                    min: {
+                                        value: 18,
+                                        message:'Debe tener más de 18 años'
+                                    }
+                                }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -171,10 +217,14 @@ function Crear({
                                 label='Especialidad'
                                 control={control}
                                 helperText='Introdusca su especialidad'
-                                handleChange={handleEspecialidad}
-                                value={especialidad}
-                                setValue={setValue}
-                                responseErrors={ errores.especialidad.length>0 ? errores.especialidad :null}
+                                solveError={solveError}
+                                rules={{
+                                    required: 'Este campo es requerido',
+                                    minLength: {
+                                        value: 4,
+                                        message:'Debe tener más de 4 caracteres'
+                                    },
+                                }}
                                 />
                             </Grid>
                         </Grid>
@@ -186,10 +236,10 @@ function Crear({
                                 control={control}
                                 options={cientificas}
                                 helperText='Seleccione una Categoría'
-                                handleChange={handleCientifica}
-                                value={categoria_cientifica}
-                                setValue={setValue}
-                                responseErrors={ errores.categoria_cientifica.length>0 ? errores.categoria_cientifica :null}
+                                solveError={solveError}
+                                rules={{
+                                    required: 'Este campo es requerido'
+                                }}
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -199,22 +249,43 @@ function Crear({
                                 control={control}
                                 options={docentes}
                                 helperText='Seleccione una Categoría'
-                                handleChange={handleDocente}
-                                value={categoria_docente}
-                                setValue={setValue}
-                                responseErrors={ errores.categoria_docente.length>0 ? errores.categoria_docente :null}
+                                solveError={solveError}
+                                rules={{
+                                    required: 'Este campo es requerido'
+                                }}
                                 />
                             </Grid>
                         </Grid>
-                        <Grid container>
-                            <Grid item xs={12}>
-                                <FormControl className='form-control'>
-                                    <Button fullWidth type='submit' variant="contained" size="large">
-                                        Guardar Profesor
-                                    </Button>
-                                </FormControl>
-                            </Grid>
-                        </Grid>
+                        {doCreate
+                            ? (<Grid container>
+                                    <Grid item xs={12}>
+                                        <FormControl className='form-control'>
+                                            <Button fullWidth type='submit' variant="contained" size="large">
+                                                Guardar Profesor
+                                            </Button>
+                                        </FormControl>
+                                </Grid>
+                            </Grid>)
+                            : (<Grid container>
+                                <Grid item xs={6}>
+                                    <FormControl className='form-control'>
+                                        <Button component='a' fullWidth onClick={()=>{
+                                        cancelEdit();
+                                        setTimeout(clearErrors("nombre"), 150);
+                                        }} variant="outlined" size="large">
+                                            Cancelar
+                                        </Button>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <FormControl className='form-control'>
+                                        <Button fullWidth type='submit' variant="contained" size="large">
+                                            Editar Profesor
+                                        </Button>
+                                    </FormControl>
+                                </Grid>
+                            </Grid>)
+                        }
                     </Grid>
                 </Paper>
             </Box>

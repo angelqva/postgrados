@@ -37,10 +37,6 @@ export default function Tabla({columns, sendEdit, sendDelete, listado, title}) {
             setTableheight(163);
         }
     },[row.length, setTableheight]);
-    
-    
-
-        
     return (
         <Box
             sx={{

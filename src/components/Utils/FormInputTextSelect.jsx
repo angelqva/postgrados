@@ -3,30 +3,29 @@ import { TextField} from '@mui/material';
 import { FormControl, FormHelperText, MenuItem} from '@mui/material';
 import { Controller} from "react-hook-form";
 
-export default function FormInputTextSelect({ name,control, handleChange, setValue, rules, label, options, helperText, responseErrors }){
-
-    const [inputValue, setInputValue] = React.useState(options[0]);
-    React.useEffect(() => {
-        setValue(inputValue)
-    }, [inputValue,setValue])
-    const handleInputChange = (event)=>{
-        setInputValue(event.target.value);
-        if(!!handleChange){handleChange(event)}
-    }
+export default function FormInputTextSelect({ name, control, rules, label, options, helperText, solveError}){
+    
     return (
         <Controller
             name={name}
             control={control}
             rules={rules}
             render={({
+                field: { onChange, value },
                 fieldState: { error },
             }) => (
-                <FormControl className='form-control' error={!!error||!!responseErrors}>
+                <FormControl className='form-control' error={!!error}>
                     <TextField
                         label={label}
                         select
-                        value={inputValue}
-                        onChange={handleInputChange}
+                        error={!!error}
+                        value={value}
+                        onChange={(e) => { 
+                            if (!!error) { 
+                                if (!!solveError) { solveError(name);}
+                            }
+                            onChange(e);
+                        }}
                     >
                         {options.map((option) => (
                             <MenuItem key={option} value={option}>
@@ -35,8 +34,8 @@ export default function FormInputTextSelect({ name,control, handleChange, setVal
                         ))}
                     </TextField>
                     {error
-                        ? <FormHelperText>error.message</FormHelperText>
-                        : <FormHelperText>{helperText}{ responseErrors && responseErrors.message }</FormHelperText>
+                        ? <FormHelperText>{error.message}</FormHelperText>
+                        : <FormHelperText>{helperText}</FormHelperText>
                     }
                 </FormControl>
             )}
