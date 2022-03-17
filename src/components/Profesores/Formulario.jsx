@@ -20,7 +20,7 @@ const docentes = [
 ];
 
 
-function Crear({
+function Formulario({
     doCreate = true,
     crearFunction,
     editFunction,
@@ -292,4 +292,4 @@ function Crear({
     )
 }
 
-export default Crear
+export default Formulario

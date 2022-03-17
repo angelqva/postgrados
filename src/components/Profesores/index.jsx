@@ -124,7 +124,7 @@ export default function Profesores() {
                 const otherSwal = withReactContent(Swal);
                 otherSwal.fire({
                     title: 'Eliminados Correctamente',
-                    text: 'Los Estudiantes han sido eliminados',
+                    text: 'Los Profesores han sido eliminados',
                     icon: 'success',
                     
                 });
@@ -140,7 +140,7 @@ export default function Profesores() {
     const sendDelete = (ids) => {
         MySwal.fire({
             title: 'Estas Seguro?',
-            text: "Se eliminaran los Estudiantes seleccionados!",
+            text: "Se eliminaran los Profesores seleccionados!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Si, Eliminalos!',
@@ -154,7 +154,7 @@ export default function Profesores() {
                 dispatch(doEliminar(ids));
                 MySwal.fire({
                     title: 'Espere, estamos:',
-                    html: 'Eliminando Esutidiantes',
+                    html: 'Eliminando Profesores',
                     allowOutsideClick: false,
                     didOpen: () => {
                         MySwal.showLoading()

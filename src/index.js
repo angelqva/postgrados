@@ -13,7 +13,7 @@ import Reportes from './components/Reportes';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Provider} from 'react-redux'
 import generateStore from './redux/store'
-
+import Custom from './components/Example/Custom'
 const store = generateStore()
 
 ReactDOM.render(
@@ -25,6 +25,7 @@ ReactDOM.render(
             <Route path="/" element={<Layout />} >
               <Route index element={<Inicio />} />
               <Route path="estudiantes" element={<Estudiantes />} />
+              <Route path="example" element={<Custom />} />
               <Route path="profesores" element={<Profesores />} />
               <Route path="postgrados-nacionales" element={<Nacionales />} />
               <Route path="postgrados-internacionales" element={<Internacionales />} />

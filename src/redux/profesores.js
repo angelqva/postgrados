@@ -204,7 +204,7 @@ export const doEliminar = (ids) => async (dispatch, getState) => {
             const { eliminados, errores } = getState().profesores;
             dispatch({
                 type: profesoresERRORES,
-                payload:{type:'eliminar', errores:[...errores.eliminar, {action:'doEliminar', msg: 'Error eliminando al estudiante con id: '+id}]}
+                payload:{type:'eliminar', errores:[...errores.eliminar, {action:'doEliminar', msg: 'Error eliminando al Profesor con id: '+id}]}
             });
             dispatch({
                 type: profesoresELIMINADOS,
