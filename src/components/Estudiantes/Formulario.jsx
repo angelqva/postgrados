@@ -129,7 +129,7 @@ function Formulario({
                             <Typography gutterBottom={false} variant='h6' className='card-title' sx={{
                                 fontSize:{ xs:'1.2em', md:'1.5em'},
                                 }}>
-                                Datos del Profesor
+                                Datos del Estudiante
                             </Typography>
                             <Typography gutterBottom={false} variant='p' className='card-subTitle' component={'p'} sx={{
                                 fontSize: { xs:'1em', md:'1.25em'},

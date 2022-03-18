@@ -78,7 +78,9 @@ export default function Estudiantes() {
     React.useEffect(() => {
         dispatch(getListado());
         return () => { 
-            cancelEdit();
+            setDoEdit(false);
+            setDoCreate(true);
+            dispatch(resetItem());
         }
     }, []);
     React.useEffect(() => {

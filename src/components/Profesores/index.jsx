@@ -67,8 +67,10 @@ export default function Profesores() {
     //listado
     React.useEffect(() => {
         dispatch(getListado());
-        return () => { 
-            cancelEdit();
+        return () => {
+            setDoEdit(false);
+            setDoCreate(true);
+            dispatch(resetItem());
         }
     }, []);
     React.useEffect(() => {
