@@ -235,6 +235,8 @@ export default function Profesores() {
     //endCrear
     //edit
     const sendEdit = (id) => {
+        setDoCreate(true);
+        setDoEdit(false);
         dispatch(resetItem());
         dispatch(setBuscando(true));
         dispatch(findItem(id));

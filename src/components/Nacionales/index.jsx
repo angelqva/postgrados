@@ -6,77 +6,83 @@ import Formulario from './Formulario'
 import { v4 as uuidv4 } from 'uuid';
 import Tabla from '../Utils/Tabla';
 import { useDispatch, useSelector } from 'react-redux';
-import { getListado, setErrores, setEliminados, doEliminar, doCrear, setCreando, resetItem, findItem, setBuscando, doEditar, setEditando} from '../../redux/estudiantes'
+import { getListado as profesoresList } from '../../redux/profesores';
+import { getListado as estudiantesList } from '../../redux/estudiantes';
+import { getListado, setErrores, setEliminados, doEliminar, doCrear, setCreando, resetItem, findItem, setBuscando, doEditar, setEditando} from '../../redux/nacionales'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 const MySwal = withReactContent(Swal)
 
-export default function Estudiantes() {
+function formatDate(d) {
+    if (Object.prototype.toString.call(d) !== '[object Date]');
+        d = new Date(d);
+    var month = '' + (d.getMonth() + 1);
+    var day = '' + d.getDate();
+    var year = d.getFullYear();
+
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+
+export default function Nacionales() {
     const columns = [    
         {
-            field: 'nombre',
-            headerName: 'Nombre',
+            field: 'tema',
+            headerName: 'Tema',
             width: 100,
         },
         {
-            field: 'apellidos',
-            headerName: 'Apellidos',
+            field: 'codigo',
+            headerName: 'Codigo',
             width: 150,
         },
         {
-            field: 'carnet_identidad',
-            headerName: 'CI',
+            field: 'inicio',
+            headerName: 'Inicio',
             width: 130,
         },
         {
-            field: 'edad',
-            headerName: 'Edad',
-            type: 'number',
-            width: 60,
+            field: 'fin',
+            headerName: 'Fin',
+            width: 130,
         },
         {
-            field: 'especialidad',
-            headerName: 'Especialidad',        
-            width: 120,
+            field: 'cantidad_horas',
+            headerName: 'Horas Clases',
+            width: 130,
         },
         {
-            field: 'sexo',
-            headerName: 'Sexo',        
-            width: 70,
-        },
-        {
-            field: 'nacionalidad',
-            headerName: 'Nacionalidad',        
-            width: 100,
-        },
-        {
-            field: 'residencia',
-            headerName: 'Residencia',        
-            width:90,
-        },
-        {
-            field: 'graduacion',
-            headerName: 'Graduación',        
-            width: 90,
+            field: 'colegiatura',
+            headerName: 'Colegiatura',
+            width: 130,
         },
     ];
     const dispatch = useDispatch();
+    const lista_nacionales = useSelector(store => store.nacionales.listado);
+    const lista_profesores = useSelector(store => store.profesores.listado);
     const lista_estudiantes = useSelector(store => store.estudiantes.listado);
-    const eliminados = useSelector(store => store.estudiantes.eliminados);
-    const errRead = useSelector(store => store.estudiantes.errores.read);
-    const errEliminar = useSelector(store => store.estudiantes.errores.eliminar);
-    const errFormulario = useSelector(store => store.estudiantes.errores.formulario);
-    const creando = useSelector(store => store.estudiantes.creando);
-    const buscando = useSelector(store => store.estudiantes.buscando);
-    const editando = useSelector(store => store.estudiantes.editando);
-    const item = useSelector(store => store.estudiantes.item);
+    const eliminados = useSelector(store => store.nacionales.eliminados);
+    const errRead = useSelector(store => store.nacionales.errores.read);
+    const errEliminar = useSelector(store => store.nacionales.errores.eliminar);
+    const errFormulario = useSelector(store => store.nacionales.errores.formulario);
+    const creando = useSelector(store => store.nacionales.creando);
+    const buscando = useSelector(store => store.nacionales.buscando);
+    const editando = useSelector(store => store.nacionales.editando);
+    const item = useSelector(store => store.nacionales.item);
     const [doCreate, setDoCreate] = React.useState(true);
     const [doEdit, setDoEdit] = React.useState(false);
     const [doReset, setDoReset] = React.useState(false);
-    const tableTitle = 'Listado de Estudiantes';
+    const tableTitle = 'Postgrados Nacionales';
     //listado
     React.useEffect(() => {
         dispatch(getListado());
+        dispatch(profesoresList());
+        dispatch(estudiantesList());
         return () => { 
             setDoEdit(false);
             setDoCreate(true);
@@ -136,7 +142,7 @@ export default function Estudiantes() {
                 const otherSwal = withReactContent(Swal);
                 otherSwal.fire({
                     title: 'Eliminados Correctamente',
-                    text: 'Los Estudiantes han sido eliminados',
+                    text: 'Los Postgrados Nacionales han sido eliminados',
                     icon: 'success',
                     
                 });
@@ -152,7 +158,7 @@ export default function Estudiantes() {
     const sendDelete = (ids) => {
         MySwal.fire({
             title: 'Estas Seguro?',
-            text: "Se eliminaran los Estudiantes seleccionados!",
+            text: "Se eliminaran los Postgrados seleccionados!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Si, Eliminalos!',
@@ -166,7 +172,7 @@ export default function Estudiantes() {
                 dispatch(doEliminar(ids));
                 MySwal.fire({
                     title: 'Espere, estamos:',
-                    html: 'Eliminando Estudiantes',
+                    html: 'Eliminando Postgrados',
                     allowOutsideClick: false,
                     didOpen: () => {
                         MySwal.showLoading()
@@ -187,12 +193,20 @@ export default function Estudiantes() {
     const dispatchSolveError = (error)=>{
         dispatch(setErrores('eliminar', 'formulario', error));
     }
-    const crearEstudiante = (estudiante) => {
+    
+    const crearPostgrado = (Postgrado) => {
         dispatch(setCreando(true));
-        dispatch(doCrear(estudiante));
+        var profesor = Postgrado.profesor;
+        Postgrado.profesor = profesor.id;
+        var estudiantes = [];
+        Postgrado.estudiantes.forEach(element => estudiantes.push(element.id));
+        Postgrado.estudiantes = estudiantes;
+        Postgrado.inicio = formatDate(Postgrado.inicio);
+        Postgrado.fin = formatDate(Postgrado.fin);
+        dispatch(doCrear(Postgrado));
         MySwal.fire({
             title: 'Espere, estamos:',
-            text: `Creando al Estudiante ${estudiante.nombre} ${estudiante.apellidos}`,
+            text: `Creando al Postgarado ${Postgrado.tema}-${Postgrado.codigo}`,
             allowOutsideClick: false,
             didOpen: () => {
                 MySwal.showLoading()
@@ -228,7 +242,7 @@ export default function Estudiantes() {
             setDoReset(false);
             MySwal.fire({
                 title: 'Creado Satisfactoriamente',
-                text: 'El Estudiante: '+item.nombre+' '+item.apellidos,
+                text: `El Postgrado: ${item.tema}-${item.codigo}`,
                 icon: 'success',
                 didOpen: () => { 
                     MySwal.hideLoading();
@@ -252,7 +266,7 @@ export default function Estudiantes() {
         dispatch(findItem(id));
         MySwal.fire({
             title: 'Espere, estamos:',
-            text: `Buscando cargando los datos del Estudiante`,
+            text: `Buscando cargando los datos del Postgrado`,
             allowOutsideClick: false,
             didOpen: () => {
                 MySwal.showLoading()
@@ -281,25 +295,23 @@ export default function Estudiantes() {
         }
     },[buscando])
 
-    const editEstudiante = (estudiante) => {
+    const editPostgrado = (postgrado) => {
         var partialEdit = {};
         var cont = 0;
+        var profesor = postgrado.profesor;
+        postgrado.profesor = profesor.id;
+        var estudiantes = [];
+        postgrado.estudiantes.forEach(element => estudiantes.push(element.id));
+        postgrado.estudiantes = estudiantes;
+        postgrado.inicio = formatDate(postgrado.inicio);
+        postgrado.fin = formatDate(postgrado.fin);
         for (const property in item) { 
             if (property !== "id") {
-                if (property === "edad") { 
-                    if (parseInt(estudiante[property]) !== item[property]) { 
-                        partialEdit[property] = parseInt(estudiante[property]);
-                        cont++
-                    }
-                }
-                else if (estudiante[property] !== item[property]) { 
-                    partialEdit[property] = estudiante[property];
-                    cont++
-                }
+                partialEdit[property] = postgrado[property];
+                cont++
             }
         }
         if (cont >= 1) {
-            console.log(doEdit);
             dispatch(setEditando(true));
             dispatch(doEditar(partialEdit))
             MySwal.fire({
@@ -335,8 +347,8 @@ export default function Estudiantes() {
                 <Grid item xs={12} md={4}>
                     <Formulario
                         dispatchSolveError={dispatchSolveError}
-                        crearFunction={crearEstudiante}
-                        editFunction={editEstudiante}
+                        crearFunction={crearPostgrado}
+                        editFunction={editPostgrado}
                         errores={errFormulario}
                         doCreate={doCreate}
                         doEdit={doEdit}
@@ -345,12 +357,14 @@ export default function Estudiantes() {
                         finishReset={finishReset}
                         item={item}
                         cantReset={cantReset}
+                        profesores={lista_profesores}
+                        estudiantes={lista_estudiantes}
                     />
                 </Grid>
                 <Grid item xs={12} md={8}>
                     <Tabla
                         key={uuidv4()}
-                        listado={lista_estudiantes}
+                        listado={lista_nacionales}
                         columns={columns}
                         title={tableTitle}
                         sendEdit={sendEdit}

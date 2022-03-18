@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Box, Grid } from '@mui/material';
 import Crear from './Crear'
-import Tabla from './Tabla';
 
-export default function Nacionales() {
+
+export default function Internacionales() {
     return (
         <Box sx={{ flexGrow: 1 }}>
             <Grid container>
@@ -11,7 +11,7 @@ export default function Nacionales() {
                     <Crear />
                 </Grid>
                 <Grid item xs={12} md={8}>
-                    <Tabla />
+                    
                 </Grid>
             </Grid>
         </Box>

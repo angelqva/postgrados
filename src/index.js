@@ -7,8 +7,8 @@ import Layout from './components/Template/Layout';
 import Inicio from './components/Inicio';
 import Estudiantes from './components/Estudiantes';
 import Profesores from './components/Profesores';
-import Nacionales from './components/Postgrados/Nacionales';
-import Internacionales from './components/Postgrados/Internacionales';
+import Nacionales from './components/Nacionales';
+import Internacionales from './components/Internacionales';
 import Reportes from './components/Reportes';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Provider} from 'react-redux'

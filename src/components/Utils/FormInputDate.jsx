@@ -9,7 +9,7 @@ import enUS from "date-fns/locale/en-US";
 
 
 
-export default function FormInputText({ name, control,setValue, rules, label, helperText, solveError, ...dateProps }) {
+export default function FormInputDate({ name, control,setValue, rules, label, helperText, solveError, ...dateProps }) {
     
     return (
         <Controller
